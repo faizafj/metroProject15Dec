@@ -20,72 +20,31 @@ import com.emily.service.ClientService;
 
 @Controller
 public class ClientController {
+
     @Autowired
     private ClientService service;
 
-
-    //First page which is loaded
-    // Ask user to inputs their ID to login or they can register a new account.
+    // User inputs ID to login
     @RequestMapping("/")
     public ModelAndView getUserIdPage() {
-        return new ModelAndView("signInOrRegisterPage", "customer", new Customer());
+        return new ModelAndView("loginPage");
     }
 
-    @RequestMapping("/addNewCustomer")
-    public ModelAndView addNewCustomerController(@ModelAttribute("customer") Customer newCustomer, @RequestParam("dob") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date, HttpSession session) {
-        ModelAndView modelAndView = new ModelAndView();
-
-        newCustomer.setCustomerDateOfBirth(date);
-        Customer newRegisteredCustomer = service.addNewCustomer(newCustomer); //puts customer details into db
-
-        String message;
-
-        if (newRegisteredCustomer != null) {
-            message = "New Account Created";
-            //need to add the object
-
-            int registeredCustomerId = newRegisteredCustomer.getCustomerId();
-            session.setAttribute("customerId", registeredCustomerId);
-            message = "your Id is" + registeredCustomerId;
-
-            modelAndView.setViewName("viewBalance");
-        } else {
-            message = "Unfortunately a new account was not created";
-            modelAndView.setViewName("signInOrRegisterPage");
-        }
-        modelAndView.addObject("message", message);
-
-        return modelAndView;
-
-    }
-
-    //View customer details, including their balance and tap in / tap out functions
+    // Customer Account page
     @RequestMapping("/viewBalance")
     public ModelAndView accountController(@RequestParam("customerId") int id, HttpSession session) {
-            //session.getAttribute("registeredCustomerId");
-            String numberOfCustomer = session.getAttribute("registeredCustomerId").toString();
-            int customerId = Integer.parseInt(numberOfCustomer);
-
-
         ModelAndView modelAndView = new ModelAndView();
 
-        Customer customer = null;
-        Customer customer2 = service.loginCheck(customerId); //registered
+        Customer customer = service.loginCheck(id);
 
-        if (customer2 != null){
-            customer = service.loginCheck(customerId);
-        } else {
-            customer = service.loginCheck(id);
-        }
-
-        if (customer != null ) { //If a customer exists
-            session.setAttribute("customer", customer); //set customer details to session
-            session.setAttribute("customerName", customer.getCustomerFirstName()); //customer name is used to displayed in HTML
-            modelAndView.addObject("stationObj", new Station()); //Used for station drop down list
+        if (customer != null) {
+            session.setAttribute("customer", customer);
+            session.setAttribute("customerName", customer.getCustomerFirstName());
             modelAndView.setViewName("viewBalance");
+            modelAndView.addObject("stationObj",new Station());
         } else {
             modelAndView.addObject("message", "No account found with that Id, Please try again");
-            modelAndView.setViewName("signInOrRegisterPage"); //if user not logged in, redirected to login page
+            modelAndView.setViewName("loginPage");
         }
 
         Collection<Station> stationList = service.getAllStations(); //List of all stations
@@ -100,12 +59,35 @@ public class ClientController {
     }
 
 
-//	// Create a new Customer
-//	@RequestMapping("/addNewCustomerPage")
-//	public ModelAndView addPageController() {
-//
-//		return new ModelAndView("InputNewCustomer", "customer", new Customer());
-//	}
+
+    // Create a new Customer
+    @RequestMapping("/addNewCustomerPage")
+    public ModelAndView addPageController() {
+
+        return new ModelAndView("registerPage", "customer", new Customer());
+    }
+
+
+    @RequestMapping("/addNewCustomer")
+    public ModelAndView addNewCustomerController(@ModelAttribute("customer") Customer newCustomer, @RequestParam("customerDateOfBirth") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        ModelAndView modelAndView = new ModelAndView();
+        Customer customer = newCustomer;
+        customer.setCustomerDateOfBirth(date);
+        String message;
+
+        if (service.addNewCustomer(customer) != null) {
+            message = "New Account Created";
+            modelAndView.setViewName("loginPage");
+        } else {
+            message = "Unfortunately a new account was not created";
+            modelAndView.setViewName("registerPage");
+        }
+
+        modelAndView.addObject("message", message);
+
+        return modelAndView;
+
+    }
 
 
 }

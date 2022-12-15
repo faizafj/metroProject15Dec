@@ -34,12 +34,13 @@
     <article id="side1">
         <img th:src="@{images/profilepic.png}" id="profilePic">
         <br>
-<!--        <h2 id="currentBalance" th:text="${'Your current balance: £' + session.customer.customerBalance}"></h2>-->
+        <!--        <h2 id="currentBalance" th:text="${'Your current balance: £' + session.customer.customerBalance}"></h2>-->
         <form action="#" th:action="@{./anyUrl}" th:object="${stationObj}">
             <br>
             Select your current location :
             <select id="selection" th:field="*{stationName}">
-                <option th:each="station : ${stations}" th:value="${station.stationId}" th:label="${station.stationName}"
+                <option th:each="station : ${stations}" th:value="${station.stationId}"
+                        th:label="${station.stationName}"
                 ></option>
             </select>
         </form>

@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="https://thymeleaf.org">
 <head>
 <meta charset="ISO-8859-1">
 <title>Insert title here</title>
+	<link th:href="@{/css/styles.css}" rel="stylesheet">
 </head>
 <body>
 	<h1>Enter New Customer</h1>
@@ -15,6 +16,8 @@
 		Enter Date of Birth : <input type="date" name="dob"><br><br>
 		
 		<input type="submit" value="Add">
+
+		<ul><li class="signupInstead"> <a href="login.html">Log In?</a></li> </ul>
 		
 		<h2 th:text="${message}"></h2>
 	</form>

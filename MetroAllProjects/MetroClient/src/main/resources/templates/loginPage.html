@@ -36,48 +36,13 @@
         <button type="submit" value="Login" class="submit-btn">Log in</button>
     </form>
 
-    <div>
-        <h2 th:text="${message}"></h2>
-        <form action="#" id="register" th:action="@{./addNewCustomer}" th:object="${customer}" method="post" class="input-group">
-            <input type="text" th:field="*{customerFirstName}" class="input-field" placeholder="First Name(s)" required>
-            <input type="text" th:field="*{customerSurname}" class="input-field" placeholder="Surname" required>
-            <input type="text" th:field="*{customerEmail}" class="input-field" placeholder="Email Address" required>
-            <input type="date" class="input-field" name="dob" required>
-
-            <button type="submit" value="Add" class="submit-btn">Register</button>
-
-        </form>
-    </div>
+    <ul>
+        <li class="signupInstead"> <a href="signup.html">Sign Up?</a></li>
+    </ul>
 </div>
 
 
 </div>
-</div>
-
-<script>
-                var x = document.getElementById("login");
-                var y = document.getElementById("register");
-                var z = document.getElementById("btn");
-
-                function register()
-                {
-                    x.style.left = "-450px";
-                    y.style.left = "5px";
-                    z.style.left = "100px";
-                }
-
-                function login()
-                {
-                    x.style.left = "0px";
-                    y.style.left = "450px";
-                    z.style.left = "0px";
-                }
-
-</script>
-
-
-</header>
-
 
 <footer>
     © Metro Marvel 2022
