@@ -28,13 +28,13 @@
     </nav>
     </div>
 </header>
-<h2 id="greeting" th:text="${'Welcome ' + session.customer.customerFirstName}"></h2>
+<!--<h2 id="greeting" th:text="${'Welcome ' + session.customer.customerFirstName}"></h2>-->
 <article id="mainContainer" align="center">
 
     <article id="side1">
         <img th:src="@{images/profilepic.png}" id="profilePic">
         <br>
-        <h2 id="currentBalance" th:text="${'Your current balance: £' + session.customer.customerBalance}"></h2>
+<!--        <h2 id="currentBalance" th:text="${'Your current balance: £' + session.customer.customerBalance}"></h2>-->
         <form action="#" th:action="@{./anyUrl}" th:object="${stationObj}">
             <br>
             Select your current location :

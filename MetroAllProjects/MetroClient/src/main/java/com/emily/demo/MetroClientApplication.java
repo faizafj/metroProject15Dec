@@ -9,7 +9,7 @@ import org.springframework.web.client.RestTemplate;
 
 @SpringBootApplication(scanBasePackages="com.emily")
 @EntityScan(basePackages = "com.emily.entity")
-@EnableJpaRepositories(basePackages = "com.emily.persistance")
+@EnableJpaRepositories(basePackages = "com.emily.persistence")
 public class MetroClientApplication {
 
 	public static void main(String[] args) {

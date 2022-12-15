@@ -37,6 +37,7 @@
     </form>
 
     <div>
+        <h2 th:text="${message}"></h2>
         <form action="#" id="register" th:action="@{./addNewCustomer}" th:object="${customer}" method="post" class="input-group">
             <input type="text" th:field="*{customerFirstName}" class="input-field" placeholder="First Name(s)" required>
             <input type="text" th:field="*{customerSurname}" class="input-field" placeholder="Surname" required>

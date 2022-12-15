@@ -17,74 +17,87 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.emily.entity.Customer;
 import com.emily.service.ClientService;
+
 @Controller
 public class ClientController {
-	@Autowired
-	private ClientService service;
+    @Autowired
+    private ClientService service;
 
 
-	//First page which is loaded
-	// Ask user to inputs their ID to login or they can register a new account.
-	@RequestMapping("/")
-	public ModelAndView getUserIdPage() {
-		return new ModelAndView("signInOrRegisterPage" ,"customer", new Customer());
-	}
+    //First page which is loaded
+    // Ask user to inputs their ID to login or they can register a new account.
+    @RequestMapping("/")
+    public ModelAndView getUserIdPage() {
+        return new ModelAndView("signInOrRegisterPage", "customer", new Customer());
+    }
 
-	@RequestMapping("/addNewCustomer")
-	public ModelAndView addNewCustomerController(@ModelAttribute("customer") Customer newCustomer, @RequestParam("dob") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date, HttpSession session) {
-		ModelAndView modelAndView = new ModelAndView();
+    @RequestMapping("/addNewCustomer")
+    public ModelAndView addNewCustomerController(@ModelAttribute("customer") Customer newCustomer, @RequestParam("dob") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date, HttpSession session) {
+        ModelAndView modelAndView = new ModelAndView();
 
-		newCustomer.setCustomerDateOfBirth(date);
-		Customer newRegisteredCustomer = service.addNewCustomer(newCustomer);
+        newCustomer.setCustomerDateOfBirth(date);
+        Customer newRegisteredCustomer = service.addNewCustomer(newCustomer); //puts customer details into db
+
+        String message;
+
+        if (newRegisteredCustomer != null) {
+            message = "New Account Created";
+            //need to add the object
+
+            int registeredCustomerId = newRegisteredCustomer.getCustomerId();
+            session.setAttribute("customerId", registeredCustomerId);
+            message = "your Id is" + registeredCustomerId;
+
+            modelAndView.setViewName("viewBalance");
+        } else {
+            message = "Unfortunately a new account was not created";
+            modelAndView.setViewName("signInOrRegisterPage");
+        }
+        modelAndView.addObject("message", message);
+
+        return modelAndView;
+
+    }
+
+    //View customer details, including their balance and tap in / tap out functions
+    @RequestMapping("/viewBalance")
+    public ModelAndView accountController(@RequestParam("customerId") int id, HttpSession session) {
+            //session.getAttribute("registeredCustomerId");
+            String numberOfCustomer = session.getAttribute("registeredCustomerId").toString();
+            int customerId = Integer.parseInt(numberOfCustomer);
 
 
-		String message;
+        ModelAndView modelAndView = new ModelAndView();
 
-		if (newRegisteredCustomer != null) {
-			message = "New Account Created";
-			modelAndView.setViewName("CustomerBalance");
-			int registeredCustomerId = newRegisteredCustomer.getCustomerId();
-			session.setAttribute("customerId", registeredCustomerId);
-		} else {
-			message = "Unfortunately a new account was not created";
-			modelAndView.setViewName("registerPage");
-		}
+        Customer customer = null;
+        Customer customer2 = service.loginCheck(customerId); //registered
 
-		modelAndView.addObject("message", message);
+        if (customer2 != null){
+            customer = service.loginCheck(customerId);
+        } else {
+            customer = service.loginCheck(id);
+        }
 
-		return modelAndView;
+        if (customer != null ) { //If a customer exists
+            session.setAttribute("customer", customer); //set customer details to session
+            session.setAttribute("customerName", customer.getCustomerFirstName()); //customer name is used to displayed in HTML
+            modelAndView.addObject("stationObj", new Station()); //Used for station drop down list
+            modelAndView.setViewName("viewBalance");
+        } else {
+            modelAndView.addObject("message", "No account found with that Id, Please try again");
+            modelAndView.setViewName("signInOrRegisterPage"); //if user not logged in, redirected to login page
+        }
 
-	}
+        Collection<Station> stationList = service.getAllStations(); //List of all stations
+        modelAndView.addObject("StationList", stationList); //adds the station object to website.
+        return modelAndView; //returns everything
+    }
 
-	//View customer details, including their balance and tap in / tap out functions
-	@RequestMapping("/viewBalance")
-	public ModelAndView accountController(@RequestParam("customerId") int id, HttpSession session) {
-		session.getAttribute("registeredCustomerId");
-
-		ModelAndView modelAndView = new ModelAndView();
-
-		Customer customer = service.loginCheck(id);
-
-		if (customer != null) { //If a customer exists
-			session.setAttribute("customer", customer); //set customer details to session
-			session.setAttribute("customerName", customer.getCustomerFirstName()); //customer name is used to displayed in HTML
-			modelAndView.setViewName("viewBalance");
-			modelAndView.addObject("stationObj",new Station()); //Used for station drop down list
-		} else {
-			modelAndView.addObject("message", "No account found with that Id, Please try again");
-			modelAndView.setViewName("/signInOrRegisterPage"); //if user not logged in, redirected to login page
-		}
-
-		Collection<Station> stationList  = service.getAllStations(); //List of all stations
-		modelAndView.addObject("StationList", stationList); //adds the station object to website.
-		return modelAndView; //returns everything
-	}
-
-	@ModelAttribute("stations") //Creates a DOM object called stations.
-	public Collection<Station> getStation (){
-		Collection<Station> stationList  = service.getAllStations(); //all stations
-		return stationList; //returns the station list
-	}
+    @ModelAttribute("stations") //Creates a DOM object called stations.
+    public Collection<Station> getStation() {
+        Collection<Station> stationList = service.getAllStations(); //all stations
+        return stationList; //returns the station list
+    }
 
 
 //	// Create a new Customer
