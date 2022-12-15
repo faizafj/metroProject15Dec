@@ -67,19 +67,43 @@ public class ClientController {
         return new ModelAndView("registerPage", "customer", new Customer());
     }
 
+//
+//    @RequestMapping("/addNewCustomer")
+//    public ModelAndView addNewCustomerController(@ModelAttribute("customer") Customer newCustomer, @RequestParam("customerDateOfBirth") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+//        ModelAndView modelAndView = new ModelAndView();
+//        newCustomer.setCustomerDateOfBirth(date);
+//        String message;
+//
+//        if (service.addNewCustomer(newCustomer) != null) {
+//            message = "New Account Created";
+//            modelAndView.setViewName("loginPage");
+//        } else {
+//            message = "Unfortunately a new account was not created";
+//            modelAndView.setViewName("registerPage");
+//        }
+//
+//        modelAndView.addObject("message", message);
+//
+//        return modelAndView;
+//
+//    }
 
     @RequestMapping("/addNewCustomer")
-    public ModelAndView addNewCustomerController(@ModelAttribute("customer") Customer newCustomer, @RequestParam("customerDateOfBirth") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+    public ModelAndView addNewCustomerController(@ModelAttribute("customer") Customer newCustomer, @RequestParam("dob") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date, HttpSession session) {
         ModelAndView modelAndView = new ModelAndView();
-        Customer customer = newCustomer;
-        customer.setCustomerDateOfBirth(date);
+
+        newCustomer.setCustomerDateOfBirth(date);
+        Customer newRegisteredCustomer = service.addNewCustomer(newCustomer);
+
         String message;
 
-        if (service.addNewCustomer(customer) != null) {
+        if (newRegisteredCustomer != null) {
             message = "New Account Created";
             modelAndView.setViewName("loginPage");
+            int registeredCustomerId = newRegisteredCustomer.getCustomerId();
+            session.setAttribute("customerId", registeredCustomerId);
         } else {
-            message = "Unfortunately a new account was not created";
+            message = "You must be over 11 to register for a new account";
             modelAndView.setViewName("registerPage");
         }
 
@@ -88,6 +112,5 @@ public class ClientController {
         return modelAndView;
 
     }
-
 
 }
